@@ -1,0 +1,30 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": false,
+  "showAttachments": true,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    {
+      "query": "tag:progamaçao",
+      "color": {
+        "a": 1,
+        "rgb": 1456781
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": false,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1.04427083333333,
+  "lineSizeMultiplier": 1.19739583333333,
+  "collapse-forces": true,
+  "centerStrength": 0.5,
+  "repelStrength": 11.0416666666667,
+  "linkStrength": 0,
+  "linkDistance": 150,
+  "scale": 1.013643194218201,
+  "close": true
+}
