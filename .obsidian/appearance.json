@@ -1,8 +1,0 @@
-{
-  "cssTheme": "Vanilla AMOLED Color",
-  "accentColor": "#745dd0",
-  "theme": "obsidian",
-  "enabledCssSnippets": [
-    "cursor-smooth-obsidian"
-  ]
-}
