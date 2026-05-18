@@ -1,0 +1,12 @@
+## <font color="#8db3e2">LINUX</font>
+- `cd <nome da pasta>` - pra ir pra pastas  ex: cd user/pasta/supasta
+- `ls` - listar tudo que tem dentro da pasta
+- `cd ..` - volta um pasta 
+- `cd` - voltar pro inicio
+- `clear` - limpa comandos da tela or control + L
+- `mkdir <nome da pasta>` - criar  uma pasta
+- `echo <mensagem> > <nome e extensao do arquivo>` - echo  imprimi algo na tela e > nesse caso ele redirecioan para onde essa mensagem vai se o aruivo nao foi criado ele cria e escreve oq foi pedido
+- `rm -rf <nome da pasta>` - apaga tudo que tem dentro da pasta
+- `openssl sha1 <nome e extensao do arquivo>` - para mostrar o hash de 40 caracteres
+- `cat <nome do arquivo>` - para ver oq tem dentro do arquivo
+- `pwd` - mostra aonde voce esta ex: user/pasta/subpasta/arquivo.java

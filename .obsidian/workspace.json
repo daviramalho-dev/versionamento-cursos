@@ -4,17 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "2af044ff51626faa",
+        "id": "763598613efd2b6d",
         "type": "tabs",
         "children": [
           {
-            "id": "123e26e3655b5955",
+            "id": "eeafc1336e99b863",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "DIO/01-introducao-git-github/objetos-internos/Blob.md",
+                "mode": "preview",
+                "source": true
+              },
+              "icon": "lucide-file",
+              "title": "Blob"
             }
           }
         ]
@@ -150,12 +154,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "DIO/01-introducao-git-github/objetos-internos/Blob.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline"
+              "title": "Outline of Blob"
             }
           },
           {
@@ -199,12 +204,11 @@
             }
           }
         ],
-        "currentTab": 8
+        "currentTab": 5
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -216,12 +220,30 @@
       "command-palette:Open command palette": false,
       "bases:Create new base": false,
       "obsidian-day-planner:Timeline": false,
-      "obsidian-git:Open Git source control": false,
-      "digitalgarden:Digital Garden Publication Center": false
+      "obsidian-git:Open Git source control": false
     }
   },
-  "active": "cd582a85c7f5f2c2",
+  "active": "eeafc1336e99b863",
   "lastOpenFiles": [
+    "DIO/01-introducao-git-github/objetos-internos/Commit.md",
+    "DIO/01-introducao-git-github/objetos-internos/Blob.md",
+    "DIO/01-introducao-git-github/seguranca/Ssh.md",
+    "DIO/01-introducao-git-github/seguranca/Personal Access Token (https).md",
+    "DIO/01-introducao-git-github/seguranca/Untitled",
+    "DIO/01-introducao-git-github/conceitos-fundamentais/Navegaçao Basica.md",
+    "DIO/01-introducao-git-github/seguranca",
+    "DIO/01-introducao-git-github/Objetos Internos.md",
+    "DIO/01-introducao-git-github/Conceitos.md",
+    "DIO/01-introducao-git-github/objetos-internos/Parente (pai).md",
+    "DIO/01-introducao-git-github/objetos-internos",
+    "DIO/01-introducao-git-github/conceitos-fundamentais/Snapshot.md",
+    "DIO/01-introducao-git-github/conceitos-fundamentais/Sha-1.md",
+    "DIO/01-introducao-git-github/conceitos-fundamentais",
+    "DIO/01-introducao-git-github/objetos-internos/Tree.md",
+    "DIO/01-introducao-git-github/Untitled.base",
+    "DIO/01-introducao-git-github/Untitled.canvas",
+    "LICENSE.md",
+    "Untitled.md",
     "DIO/01-introducao-git-github",
     "DIO",
     "Untitled Folder",
