@@ -1,5 +1,5 @@
 blob (Binary Large Obeject) - É um arquivo normal do seu projeto, mas identificado por seu SHA-1
-Quando você faz `git add index.js`, o Git:
+Quando você faz `[[git add]] index.js`, o Git:
 
 1. Lê o conteúdo do arquivo
 2. Calcula o SHA-1 do conteúdo

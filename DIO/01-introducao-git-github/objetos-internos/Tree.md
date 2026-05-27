@@ -1,5 +1,5 @@
 
-**TREE** - É uma pasta/diretório do seu projeto, mas identificada por seu [[Sha-1]] Quando você faz `git add .`, o Git:
+**TREE** - É uma pasta/diretório do seu projeto, mas identificada por seu [[Sha-1]] Quando você faz  [[git add]] o Git:
 
 1. Cria [[Blob]] para cada arquivo
 2. Calcula o [[Sha-1]] da estrutura (o que tem dentro)

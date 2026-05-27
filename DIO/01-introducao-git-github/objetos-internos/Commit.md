@@ -1,12 +1,12 @@
-**COMMIT** - [[Snapshot]] do seu projeto inteiro. Aponta para uma [[Tree]] raiz, que por sua vez aponta para [[Blob]]s.
+**Commit** - [[Snapshot]] do seu projeto inteiro. Aponta para uma [[Tree]] raiz, que por sua vez aponta para [[Blob]]s.
 
 Quando você faz `git commit -m "mensagem"`, o Git:
 1. Pega a [[Tree]] raiz atual
 2. Cria um objeto commit com metadados
 3. Armazena o [[Sha-1]] do commit
 
-- COMMIT tem [[Sha-1]] próprio (identificação única)
-- COMMIT aponta para uma [[Tree]]
+- Commit tem [[Sha-1]] próprio (identificação única)
+- Commit aponta para uma [[Tree]]
 - Cada novo commit = novo [[Sha-1]]
 
 ---
@@ -48,7 +48,7 @@ Pai: def000...
 
 ## Histórico
 
-- ✓ **Commit abc000...** → Tree root123...
+- ✓ **Commit abc000...** → Tree root123... 
 - ✓ **Commit def000...** → Tree root456... ([[Parente (pai)]]: abc000)
 - ✓ **Commit ghi000...** → Tree root789... ([[Parente (pai)]]: def000)
 
@@ -79,4 +79,4 @@ git rev-parse HEAD      # SHA do último commit
 |----------|-------|------------|
 | **[[Blob]]** | Arquivo | Conteúdo muda |
 | **[[Tree]]** | Pasta | [[Blob]] ou [[Tree]] interna muda |
-| **COMMIT** | [[Snapshot]] | Você faz commit |
+| **Commit** | [[Snapshot]] | Você faz commit |

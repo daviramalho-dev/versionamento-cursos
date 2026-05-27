@@ -1,6 +1,6 @@
-**Pai (Parente)** é o **commit anterior** ao commit atual.
+**Pai (Parente)** é o **commit anterior** ao [[Commit]] atual.
 
-Cria uma **corrente/histórico** de commits:
+Cria uma **corrente/histórico** de [[Commit]]:
 
 ```
 Commit 1 (sem pai - primeira vez)
@@ -17,4 +17,4 @@ Commit 4 (pai = Commit 3)
 - ✅ Rastreia a sequência de mudanças
 - ✅ Permite voltar no tempo
 - ✅ Base para branches e merges
-- ✅ `git log` mostra a cadeia completa
+- ✅ [[git log]] mostra a cadeia completa
