@@ -1,18 +1,12 @@
+### Definição: Tree
 
-**TREE** - É uma pasta/diretório do seu projeto, mas identificada por seu [[Sha-1]] Quando você faz  [[git add]] o Git:
+Tree é como o Git representa um diretório. Ela armazena referências para [[Blob]]s (arquivos) e outras Trees (subdiretórios), identificada pelo [[Sha-1]] calculado a partir do seu conteúdo interno. Quando qualquer filho muda, a Tree recebe um novo [[Sha-1]] — e essa mudança propaga para cima até o [[Commit]].
 
-1. Cria [[Blob]] para cada arquivo
-2. Calcula o [[Sha-1]] da estrutura (o que tem dentro)
-3. Armazena como uma TREE no Git
+---
 
-- TREE muda quando conteúdo interno muda
-- TREE tem [[Sha-1]] próprio baseado nos [[Blob]] que contém
-- Cada mudança de arquivo = TREE diferente
+### Estrutura em cascata
 
-
-## EXEMPLO PRA FIXAR:
-
-Seu projeto:
+Considere este projeto e três commits:
 
 ```
 seu_projeto/
@@ -22,77 +16,45 @@ seu_projeto/
    └─ app.js
 ```
 
-### ENTRADA 1: Criar estrutura + Add + Commit
+**Commit 1 — estrutura inicial**
 
 ```
-TREE raiz root123...
-├─ BLOB index.js (abc111...)
-├─ BLOB package.json (def222...)
-└─ TREE src (src333...)
-   └─ BLOB app.js (ghi444...)
-
-└─ TREE root123... (nova) → +X no Git
-└─ TREE src333... (nova) → +X no Git
+Tree raiz  (root123)
+├─ Blob index.js      (abc111)
+├─ Blob package.json  (def222)
+└─ Tree src           (src333)
+   └─ Blob app.js     (ghi444)
 ```
 
-### ENTRADA 2: Renomear arquivo + Add + Commit
+**Commit 2 — renomear index.js → main.js**
 
 ```
-Você renomeia: index.js → main.js (conteúdo igual)
-
-TREE raiz root456...  ← NOVO! (estrutura mudou)
-├─ BLOB main.js (abc111...) ← MESMO BLOB!
-├─ BLOB package.json (def222...)
-└─ TREE src (src333...) ← MANTÉM IGUAL
-   └─ BLOB app.js (ghi444...)
-
-└─ TREE root456... (novo) → +X no Git
-└─ TREE src333... (reutilizado) → +0 no Git
+Tree raiz  (root456) ← nova (estrutura mudou)
+├─ Blob main.js       (abc111) ← mesmo blob
+├─ Blob package.json  (def222)
+└─ Tree src           (src333) ← reutilizada
+   └─ Blob app.js     (ghi444)
 ```
 
-### ENTRADA 3: Editar app.js + Add + Commit
+**Commit 3 — editar app.js**
 
 ```
-Você edita: app.js (conteúdo diferente)
-
-TREE raiz root789...  ← NOVO! (porque src mudou)
-├─ BLOB main.js (abc111...)
-├─ BLOB package.json (def222...)
-└─ TREE src (src999...) ← NOVO! (app.js mudou)
-   └─ BLOB app.js (jkl777...) ← NOVO BLOB!
-
-└─ TREE root789... (novo) → +X no Git
-└─ TREE src999... (novo) → +X no Git
+Tree raiz  (root789) ← nova (src mudou)
+├─ Blob main.js       (abc111)
+├─ Blob package.json  (def222)
+└─ Tree src           (src999) ← nova (blob filho mudou)
+   └─ Blob app.js     (jkl777) ← novo blob
 ```
 
 ---
 
-## Resultado Final
+### Cascata/Efeitos
 
-### Histórico de TREEs
-
-- ✓ **Commit 1** → TREE `root123...` (estrutura original)
-- ✓ **Commit 2** → TREE `root456...` (renomeou index.js) ← NOVA TREE RAIZ
-- ✓ **Commit 3** → TREE `root789...` (editou app.js) ← NOVA TREE RAIZ
-
-### O Cascata de Mudanças
-
-```
-Você edita: app.js
-
-├─ BLOB app.js muda
-│  └─ TREE src/ muda (porque contém app.js)
-│     └─ TREE raiz/ muda (porque contém src/)
-│        └─ COMMIT muda (porque aponta pra nova raiz)
-```
-
----
-
-## 🎯 Lição Principal
-
-|Situação|Resultado|
+|Situação|O que muda|
 |---|---|
-|Renomear arquivo|TREE raiz muda, TREE src mantém|
-|Editar arquivo em pasta|TREE dessa pasta muda + TREE raiz muda|
-|Editar arquivo na raiz|Apenas TREE raiz muda|
-|Nada muda|Mesma TREE = Git reutiliza|
+|Editar arquivo em subpasta|Novo [[Blob]] → nova Tree da pasta → nova Tree raiz|
+|Renomear arquivo|Nova Tree raiz; Trees internas sem alteração|
+|Editar arquivo na raiz|Apenas nova Tree raiz|
+|Nada muda|Mesma Tree — Git reutiliza sem custo|
+
+A propagação sempre sobe: [[Blob]] → Tree da pasta → Tree raiz → [[Commit]]. Apenas o caminho afetado gera objetos novos; o restante é reaproveitado.

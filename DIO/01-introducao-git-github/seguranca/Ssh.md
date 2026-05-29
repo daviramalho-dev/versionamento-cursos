@@ -1,236 +1,69 @@
-**SSH** - Protocolo de segurança que usa criptografia para comunicação segura com GitHub.
+### Definição: SSH
 
-## Como Funciona
+SSH é um protocolo de autenticação por criptografia assimétrica. Você gera um par de chaves — a privada fica na sua máquina, a pública vai para o GitHub. A cada conexão, o GitHub verifica se sua chave privada corresponde à pública registrada. Nenhuma senha trafega pela rede.
 
-```
-Você                          GitHub
-(Chave Privada)      ←→       (Chave Pública)
-  secreta                       registrada
-```
-
-GitHub verifica: chave privada combina com pública? ✅ Então é você!
+É a alternativa recomendada ao [[Personal Access Token (https)]]: mais seguro e sem precisar gerenciar tokens.
 
 ---
 
-## Passo 1: Gerar o Par de Chaves
+### Como fazer
+
+**1. Gerar o par de chaves**
 
 ```bash
 ssh-keygen -t ed25519 -C "seu_email@example.com"
 ```
 
-**O que acontece:**
+Gera dois arquivos em `~/.ssh/`:
 
-- Pede para confirmar local (pressione Enter)
-- Pede passphrase (senha da chave - deixe vazio ou coloque)
-- Cria 2 arquivos:
-    - `~/.ssh/id_ed25519` (chave privada - SECRETA!)
-    - `~/.ssh/id_ed25519.pub` (chave pública - compartilha)
-    - ambos em um lugar qeu vai ser falado mas normalmente em .ssh
+- `id_ed25519` — chave privada, **nunca compartilhe**
+- `id_ed25519.pub` — chave pública, vai para o GitHub
 
----
-
-## Passo 2: Iniciar SSH Agent
+**2. Iniciar o agente e adicionar a chave**
 
 ```bash
-eval "$(ssh-agent -s)"
+eval "$(ssh-agent -s)"       # inicia o agente na memória
+ssh-add ~/.ssh/id_ed25519    # adiciona a chave privada
 ```
 
-**O que faz:**
+O agente guarda a chave em memória para não precisar redigitar a passphrase.
 
-- Inicia programa que guarda sua chave na memória
-- Não precisa digitar senha toda vez
-
----
-
-## Passo 3: Adicionar Chave Privada ao Agent
+**3. Registrar a chave pública no GitHub**
 
 ```bash
-ssh-add ~/.ssh/id_ed25519
+cat ~/.ssh/id_ed25519.pub    # copie a saída
 ```
 
-**Pronto!** Sua chave privada agora está no Agent.
+Acesse `https://github.com/settings/keys` → _New SSH key_ → cole e salve.
 
----
-
-## Passo 4: Copiar Chave Pública
-
-```bash
-cat ~/.ssh/id_ed25519.pub
-```
-
-Copia a saída (começa com `ssh-ed25519...`)
-
----
-
-## Passo 5: Adicionar no GitHub
-
-1. Acesse: https://github.com/settings/keys
-2. Clique em **"New SSH key"**
-3. Dê um título (ex: "Meu Computador")
-4. **Cole** a chave pública (a que você copiou)
-5. Clique em **"Add SSH key"**
-
-**GitHub pedirá sua senha - digite e confirme**
-
----
-
-## Passo 6: Verificar Conexão
+**4. Verificar a conexão**
 
 ```bash
 ssh -T git@github.com
+# Hi seu_usuario! You've successfully authenticated...
 ```
 
-**Se funcionar, mostra:**
+**5. Configurar Git para usar SSH automaticamente**
 
-```
-Hi seu_usuario! You've successfully authenticated...
-```
-
----
-
-## Passo 7: Configurar Git para Usar SSH
- 
-**Por que:** Quando você clonar repositórios, Git usa HTTPS por padrão. Precisa configurar para usar SSH.
- 
-### Opção A: Configuração Global (recomendado)
- 
 ```bash
 git config --global url."git@github.com:".insteadOf "https://github.com/"
 ```
-**insteadOf **Substituição automática HTTPS → SSH
 
-**O que faz:** Sempre que Git ver `https://github.com/`, substitui por `git@github.com:`
- 
-### Opção B: Verificar Configuração
- 
-```bash
-git config --global --list
-```
- 
-Procure por: `url.git@github.com:.insteadof=https://github.com/`
- 
+A partir disso, URLs HTTPS são substituídas por SSH automaticamente — `git clone https://github.com/...` passa a usar SSH sem precisar trocar o comando.
+
 ---
- 
-## Passo 8: Clonar Repositório com SSH
- 
-### Quando você clona um repo no GitHub
- 
-Tem dois formatos:
- 
-**HTTPS** (padrão):
+
+### Troubleshooting
+
+|Erro|Causa|Solução|
+|---|---|---|
+|`Permission denied (publickey)`|Agente não está rodando ou chave não adicionada|`eval "$(ssh-agent -s)"` + `ssh-add ~/.ssh/id_ed25519`|
+|`No such file or directory`|Par de chaves não existe|Rode `ssh-keygen` novamente|
+|Git ainda pede senha|Chave tem passphrase e não está no agente|`ssh-add ~/.ssh/id_ed25519` e digite a passphrase|
+
 ```bash
-git clone https://github.com/usuario/repo.git
+ssh-add -l          # listar chaves ativas no agente
+ls -la ~/.ssh/      # verificar se os arquivos existem
 ```
-❌ Pede senha toda vez que push/pull
- 
-**SSH** (com chave):
-```bash
-git clone git@github.com:usuario/repo.git
-```
- Usa sua chave privada automaticamente
- 
-### Qual usar?
- 
-Se configurou SSH corretamente, ambas funcionam. Mas SSH é:
-- Mais seguro
-- Não pede senha
-- Recomendado
----
- 
-## Passo 9: Fluxo de Uso Diário
- 
-Depois de tudo configurado, seu fluxo fica:
- 
-```bash
-# 1. Clone (SSH automático)
-git clone git@github.com:usuario/repo.git
- 
-# 2. Entre na pasta
-cd repo
- 
-# 3. Faça mudanças
-echo "código novo" > app.js
- 
-# 4. Commit (normal)
-git add .
-git commit -m "Adicionar feature"
- 
-# 5. Push (usa SSH automaticamente!)
-git push
-```
- 
-Sem pedir senha! 
- 
----
- 
-## Troubleshooting
- 
-### Erro 1: "Permission denied (publickey)"
- 
-**Significado:** SSH Agent não está rodando ou chave não foi adicionada.
- 
-**Solução:**
- 
-```bash
-# Verifique quais chaves estão ativas
-ssh-add -l
- 
-# Se vazio ou erro, reinicie tudo
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
- 
-# Teste novamente
-ssh -T git@github.com
-```
- 
-### Erro 2: "No such file or directory"
- 
-**Significado:** As chaves SSH não foram criadas.
- 
-**Solução:**
- 
-Verifique se existem:
-```bash
-ls -la ~/.ssh/
-```
- 
-Deve mostrar:
-```
--rw------- id_ed25519       (chave privada)
--rw-r--r-- id_ed25519.pub   (chave pública)
-```
- 
-Se não tiver, crie novamente:
-```bash
-ssh-keygen -t ed25519 -C "seu_email@example.com"
-```
- 
-### Erro 3: "git@github.com: command not found"
- 
-**Significado:** Git não reconhece formato SSH.
- 
-**Solução:** Verifique a configuração:
-```bash
-git config --global url."git@github.com:".insteadOf "https://github.com/"
-```
- 
-Se não ajudar, use o comando completo:
-```bash
-git clone git@github.com:usuario/repo.git
-```
- 
-### Erro 4: SSH funciona mas Git ainda pede senha
- 
-**Significado:** Você tem passphrase na chave e pode ser necessário ativar no Agent.
- 
-**Solução:**
- 
-```bash
-# Ative com passphrase
-ssh-add ~/.ssh/id_ed25519
-# Digita a passphrase
- 
-# Verifique
-ssh-add -l
-```
- 
+
+> ⚠️ Nunca compartilhe `id_ed25519`. Se a chave privada vazar, delete a chave pública no GitHub imediatamente e gere um novo par.

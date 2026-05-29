@@ -1,58 +1,31 @@
-blob (Binary Large Obeject) - É um arquivo normal do seu projeto, mas identificado por seu SHA-1
-Quando você faz `[[git add]] index.js`, o Git:
+### Definição: Blob
 
-1. Lê o conteúdo do arquivo
-2. Calcula o SHA-1 do conteúdo
-3. Armazena como um blob no Git 
+Blob (Binary Large Object) é como o Git armazena o conteúdo de um arquivo. Ao executar [[git add]], o Git lê o arquivo, calcula o [[Sha-1]] do conteúdo e salva um blob no repositório interno. O nome e o caminho do arquivo não fazem parte do blob — isso é responsabilidade da [[Tree]].
 
-- Git NÃO duplica conteúdo idêntico
-- Economiza espaço reutilizando blobs
-- Cada mudança de conteúdo = novo blob
-
-# EXEMPLO PRA FIXAR:
-
-
-### ENTRADA 1: Criar + Add + Commit
-
-```
-video.mp4 (500MB)
-└─ blob abc123... (novo) → +500MB no Git
-```
-
-### ENTRADA 2: Renomear + Add + Commit
-
-```
-meu_video.mp4 (mesmo conteúdo)
-└─ blob abc123... (reutilizado) → +0MB no Git
-```
-
-### ENTRADA 3: Compactou + Add + Commit
-
-```
-meu_video.mp4 (450MB - comprimido)
-└─ blob xyz789... (novo) → +450MB no Git
-```
+A regra central: **mesmo conteúdo = mesmo [[Sha-1]] = mesmo blob**. O Git nunca duplica blobs idênticos, independente de quantos commits referenciem aquele conteúdo.
 
 ---
 
-#### Resultado Final
+### Exemplo prático
 
-##### Espaço total no Git
+Três commits com o mesmo vídeo em estados diferentes:
 
-- **950MB** (ao invés de 1.45GB sem Git)
+|Commit|Arquivo|Blob|Espaço adicionado|
+|---|---|---|---|
+|1|`video.mp4` (500MB)|`abc123` — novo|+500MB|
+|2|`meu_video.mp4` (mesmo conteúdo)|`abc123` — reutilizado|+0MB|
+|3|`meu_video.mp4` (450MB, comprimido)|`xyz789` — novo|+450MB|
 
-#### Histórico de commits
-
-- ✓ **Commit 1** → blob `abc123...` (video.mp4)
-- ✓ **Commit 2** → blob `abc123...` (meu_video.mp4) ← MESMO
-- ✓ **Commit 3** → blob `xyz789...` (meu_video.mp4) ← NOVO
+**Total no Git: 950MB** — e não 1.45GB, porque o commit 2 só renomeou o arquivo sem alterar o conteúdo. O blob `abc123` foi reaproveitado.
 
 ---
 
-### 🎯 Lição Principal
+### Cascata/Efeitos
 
 |Situação|Resultado|
 |---|---|
-|Mesmo conteúdo|= mesmo blob = Git reutiliza|
-|Conteúdo diferente|= novo blob = Git cria novo|
+|Conteúdo igual, nome diferente|Mesmo blob, mesmo [[Sha-1]] — zero espaço extra|
+|Qualquer alteração no conteúdo|Novo blob, novo [[Sha-1]]|
+|Blob referenciado por uma [[Tree]]|[[Commit]] aponta para a Tree, que aponta para o blob|
 
+> ⚠️ O Git rastreia **conteúdo**, não arquivos. Renomear não cria blob novo — modificar sim.

@@ -1,94 +1,67 @@
-Entender em qual estado um arquivo está é fundamental para usar Git com confiança. Todo arquivo em um repositório passa por diferentes estados — rastreando mudanças desde criação até consolidação no histórico.
+### Definição: Ciclo de Vida dos Arquivos
 
-### Definição
-
-O ciclo de vida no Git é o fluxo que cada arquivo segue até virar parte do histórico. Cada arquivo passa por **4 estados principais**:
+Todo arquivo em um repositório Git passa por 4 estados. Entender onde cada arquivo está é o que permite organizar commits com precisão — e corrigir erros antes de eles virarem histórico.
 
 |Estado|O que é|Commitável?|
 |---|---|---|
-|**Untracked**|Git desconhece este arquivo|❌ Não|
-|**Unmodified**|Arquivo rastreado, sem mudanças|❌ Não precisa|
-|**Modified**|Arquivo alterado, não preparado|❌ Não|
-|**Staged**|Arquivo preparado para commit|✅ Sim|
+|**Untracked**|Git desconhece o arquivo|❌|
+|**Unmodified**|Rastreado, sem mudanças|—|
+|**Modified**|Alterado, não preparado|❌|
+|**Staged**|Preparado para commit|✅|
 
-Quando você commita, o Git cria um [[Commit]] que aponta para uma [[Tree]] (representação da estrutura). Essa TREE contém [[Blob]] para cada arquivo e Sha-1 para rastrear mudanças.
+Ao commitar, o Git calcula o [[Sha-1]] de cada [[Blob]] (arquivo), monta uma [[Tree]] com a estrutura do projeto e cria um [[Commit]] apontando para ela.
 
-### Por que/Quando usar
+---
 
-Você **precisa** dominar isso porque:
+### Como fazer
 
-- Evita commitar arquivos errados ou temporários
-- Permite organizar mudanças logicamente em commits separados
-- Corrige erros **antes** de historicizar (bem mais fácil que reverter depois)
-- Melhora legibilidade do histórico — cada commit é uma mudança lógica
+**Untracked → Staged** (arquivo novo)
 
-**Caso real:** Você trabalhou em 3 coisas (bug fix, feature, docs). Com git add seletivo, faz 3 commits claros. Sem isso, tudo vira "mudanças aleatórias" — inútil para debug.
-
-### O ciclo passo a passo
-
-#### 1. Untracked → Staged (Novo arquivo)
-
-Arquivo criado? Git não o rastreia ainda.
+bash
 
 ```bash
-# Ver arquivos untracked
-git status
-
-# Adicionar arquivo específico
-git add main.js
-
-# Adicionar todos
-git add .
+git add main.js   # arquivo específico
+git add .         # todos de uma vez
 ```
 
-**O que acontece:** Arquivo sai de Untracked direto para Staged. Git prepara um [[Blob]] com seu conteúdo.
+**Unmodified → Modified → Staged** (arquivo editado)
 
-#### 2. Unmodified → Modified (Editar arquivo rastreado)
-
-Você editou um arquivo que já estava no repositório.
+bash
 
 ```bash
-# Ver quais arquivos mudaram
-git status
-
-# Ver mudanças específicas (antes de add)
-git diff main.js
+git status              # ver o que mudou
+git diff main.js        # ver as mudanças antes de adicionar
+git add main.js         # preparar para commit
+git diff --staged       # confirmar o que será commitado
+git add -p main.js      # adicionar hunk por hunk — útil para separar commits
 ```
 
-**Internamente:** Conteúdo mudou = novo Sha-1 para o arquivo = a [[Tree]] que contém esse arquivo mudará quando você commitar.
+**Staged → Commit**
 
-#### 3. Modified → Staged (Preparar mudanças)
-
-Você decide quais mudanças entram neste commit.
-
-```bash
-# Adicionar arquivo específico
-git add main.js
-
-# Ver o que será commitado
-git diff --staged
-
-# Adicionar mudanças linha por linha
-git add -p main.js
-```
-
-**Dica técnica:** `git add -p` te mostra cada hunk (bloco de mudança) e pergunta se você quer stagar. Perfeito para dividir mudanças lógicas em commits separados.
-
-#### 4. Staged → Commit (Criar snapshot)
-
-Tudo pronto? Commite.
+bash
 
 ```bash
 git commit -m "Refatora validação de email"
 ```
 
-**O que Git faz:**
+Após o commit, o arquivo volta a **Unmodified** até a próxima edição.
 
-1. Calcula [[Sha-1]] de cada [[Blob]] (arquivo modificado)
-2. Calcula [[Sha-1]] da [[Tree]] (estrutura + Shas dos arquivos)
-3. Cria [[Commit]] que aponta para essa TREE
-4. Arquivo volta a Unmodified
+---
 
-Depois do commit, até você editar novamente, o arquivo fica em Unmodified.
+### Quando usar `git add -p`
 
-**Regra de ouro:** Quando em dúvida, `git status`. Ele sempre te diz onde você está no ciclo e o que fazer.
+O `-p` mostra cada bloco de mudança individualmente e pergunta se você quer incluir. É a ferramenta certa quando você trabalhou em coisas distintas — bug fix, feature e docs ao mesmo tempo — e quer dividir em commits separados e legíveis. Um `git add .` jogaria tudo num commit só.
+
+---
+
+### Cascata/Efeitos
+
+|Ação|Transição|
+|---|---|
+|Criar arquivo|→ Untracked|
+|`git add`|Untracked / Modified → Staged|
+|`git commit`|Staged → Unmodified|
+|Editar arquivo rastreado|Unmodified → Modified|
+|`git restore --staged`|Staged → Modified / Untracked|
+
+> 💡 Quando em dúvida, [[git status]]. Ele sempre diz onde você está no ciclo e o que fazer a seguir.

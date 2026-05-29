@@ -1,77 +1,56 @@
-**Personal Access Token** - Chave de acesso alternativa à senha para autenticar com GitHub via HTTPS.
+### Definição: Personal Access Token (HTTPS)
 
-## Quando usar?
+Personal Access Token (PAT) é uma chave de acesso que substitui a senha do GitHub na autenticação via HTTPS. O GitHub removeu o suporte a senha convencional — hoje, push e pull via HTTPS exigem um token.
 
-- Você usa HTTPS para clonar (não SSH)
-- Git pede autenticação no push/pull
-- Você tá em máquina compartilhada/temporária
-
-**Melhor alternativa:** Use SSH! (mais seguro)
+> 💡 Se possível, prefira [[Ssh]] — mais seguro e sem necessidade de gerenciar tokens.
 
 ---
 
-## Passo 1: Gerar Token no GitHub
+### Como fazer
 
-1. Acesse: https://github.com/settings/tokens
-2. Clique em **"Generate new token"** → **"Generate new token (classic)"**
-3. Dê um nome (ex: "Meu Computador")
-4. Selecione **"repo"** (permissão completa para repos)
-5. Clique em **"Generate token"** na base
-6. **Copia o token** (aparece uma única vez!)
+**1. Gerar o token no GitHub**
 
----
+Acesse `https://github.com/settings/tokens` → _Generate new token (classic)_, dê um nome descritivo, marque a permissão `repo` e clique em _Generate token_.
 
-## Passo 2: Usar no Git
+⚠️ O token aparece **uma única vez**. Copie antes de sair da página.
 
-Quando Git pedir autenticação:
+**2. Usar no Git**
+
+Quando o Git pedir autenticação:
 
 ```bash
 Username: seu-usuario-github
-Password: cole-aqui-o-token-completo
+Password: cole-o-token-aqui   # não sua senha — o token
 ```
 
----
-
-## Passo 3: Git Lembrar o Token (Opcional)
-
-Para não digitar toda vez:
+**3. Salvar para não digitar toda vez**
 
 ```bash
 git config --global credential.helper store
 ```
 
-⚠️ **Aviso:** Armazena token em texto plano. Use apenas em máquina pessoal!
-
----
-
-## Verificar Token Armazenado
+Armazena o token em texto plano em `~/.git-credentials`. Use apenas em máquina pessoal.
 
 ```bash
-cat ~/.git-credentials
+cat ~/.git-credentials   # ver tokens salvos
 ```
 
-Mostra tokens salvos (não compartilhe!)
+---
+
+### Manutenção
+
+**Renovar token expirado:** acesse `https://github.com/settings/tokens`, clique no token → _Regenerate token_, copie o novo valor e use normalmente no próximo push.
+
+**Revogar token comprometido:** mesmo caminho → _Delete_. O token para de funcionar imediatamente.
 
 ---
 
-## Renovar Token
+### Cascata/Efeitos
 
-Tokens expiram! Quando expirar:
+|Ação|Resultado|
+|---|---|
+|`credential.helper store`|Token salvo em texto plano em `~/.git-credentials`|
+|Token expirado|Push/pull falha com erro de autenticação — gere um novo|
+|Token vazado|Revogue imediatamente em `github.com/settings/tokens`|
 
-1. https://github.com/settings/tokens
-2. Clique no token expirado
-3. Clique em **"Regenerate token"**
-4. Copia o novo token
-5. Usa no Git normalmente
-
----
-
-## Revogar Token (Segurança)
-
-Se vazar ou não usar mais:
-
-1. https://github.com/settings/tokens
-2. Encontre o token
-3. Clique em **"Delete"**
-
-Pronto! Não funciona mais.
+> ⚠️ Nunca compartilhe o arquivo `~/.git-credentials` nem commite tokens em repositórios.

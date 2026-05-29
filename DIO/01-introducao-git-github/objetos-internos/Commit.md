@@ -1,82 +1,70 @@
-**Commit** - [[Snapshot]] do seu projeto inteiro. Aponta para uma [[Tree]] raiz, que por sua vez aponta para [[Blob]]s.
+### Definição: Commit (objeto interno)
 
-Quando você faz `git commit -m "mensagem"`, o Git:
-1. Pega a [[Tree]] raiz atual
-2. Cria um objeto commit com metadados
-3. Armazena o [[Sha-1]] do commit
+> Esta nota descreve o **commit como objeto interno do Git** — diferente de [[git commit]], que é o comando. Raramente você interage com isso diretamente, mas entender a estrutura explica por que o Git funciona como funciona.
 
-- Commit tem [[Sha-1]] próprio (identificação única)
-- Commit aponta para uma [[Tree]]
-- Cada novo commit = novo [[Sha-1]]
+Commit é um [[Snapshot]] do projeto inteiro. Internamente, ele armazena metadados (autor, data, mensagem) e aponta para uma [[Tree]] raiz — que por sua vez aponta para [[Blob]]s e outras Trees. Cada commit tem seu próprio [[Sha-1]] e carrega a referência do commit anterior ([[Parente (pai)]]), formando a cadeia do histórico.
 
 ---
 
-## EXEMPLO PRA FIXAR:
+### Estrutura em cascata
 
-### ENTRADA 1: Criar estrutura + Commit
-```
-COMMIT abc000...
-└─ Tree root123...
-   ├─ Blob index.js (abc111...)
-   └─ Tree src (src333...)
-      └─ Blob app.js (ghi444...)
-```
+Três commits mostrando como objetos são reutilizados ou recriados:
 
-### ENTRADA 2: Renomear arquivo + Commit
-```
-COMMIT def000... ← NOVO!
-└─ Tree root456... ← NOVA!
-   ├─ Blob main.js (abc111...) ← MESMO BLOB
-   └─ Tree src (src333...) ← MESMA TREE
-      └─ Blob app.js (ghi444...)
+**Commit 1 — estrutura inicial**
 
-Pai: abc000...
+```
+COMMIT abc000
+└─ Tree root123
+   ├─ Blob index.js  (abc111)
+   └─ Tree src       (src333)
+      └─ Blob app.js (ghi444)
 ```
 
-### ENTRADA 3: Editar app.js + Commit
-```
-COMMIT ghi000... ← NOVO!
-└─ Tree root789... ← NOVA!
-   ├─ Blob main.js (abc111...)
-   └─ Tree src (src999...) ← NOVA!
-      └─ Blob app.js (jkl777...) ← NOVO BLOB!
+**Commit 2 — renomear index.js → main.js**
 
-Pai: def000...
 ```
+COMMIT def000         ← novo
+└─ Tree root456       ← nova (filho mudou)
+   ├─ Blob main.js    (abc111) ← mesmo blob
+   └─ Tree src        (src333) ← mesma tree
+      └─ Blob app.js  (ghi444)
+Pai: abc000
+```
+
+**Commit 3 — editar app.js**
+
+```
+COMMIT ghi000         ← novo
+└─ Tree root789       ← nova
+   ├─ Blob main.js    (abc111)
+   └─ Tree src        (src999) ← nova (blob filho mudou)
+      └─ Blob app.js  (jkl777) ← novo blob
+Pai: def000
+```
+
+Apenas o que mudou gera objetos novos. O restante é reaproveitado.
 
 ---
 
-## Histórico
+### Comandos para inspecionar
 
-- ✓ **Commit abc000...** → Tree root123... 
-- ✓ **Commit def000...** → Tree root456... ([[Parente (pai)]]: abc000)
-- ✓ **Commit ghi000...** → Tree root789... ([[Parente (pai)]]: def000)
-
----
-
-## Conexão Completa
-
-```
-COMMIT → Tree → Blob/Tree → Blob/Tree...
-```
-
----
-
-## Comandos
+bash
 
 ```bash
-git log                 # Todos os commits
-git log --oneline       # Commits abreviados
-git show <SHA>          # Detalhes de um commit
-git rev-parse HEAD      # SHA do último commit
+git log                # histórico completo
+git log --oneline      # histórico com SHA abreviado
+git show <SHA>         # detalhes de um commit
+git rev-parse HEAD     # SHA do commit mais recente
 ```
 
 ---
 
-## Diferenças
+### Cascata/Efeitos
 
-| Conceito | O quê | Muda quando |
-|----------|-------|------------|
-| **[[Blob]]** | Arquivo | Conteúdo muda |
-| **[[Tree]]** | Pasta | [[Blob]] ou [[Tree]] interna muda |
-| **Commit** | [[Snapshot]] | Você faz commit |
+|Objeto|O que representa|Novo SHA quando|
+|---|---|---|
+|[[Blob]]|Conteúdo de um arquivo|Conteúdo muda|
+|[[Tree]]|Estrutura de um diretório|Qualquer filho muda|
+|Commit|[[Snapshot]] completo|Você executa [[git commit]]|
+
+A cadeia é sempre: `Commit → Tree → Blob / Tree → Blob...` Uma mudança num [[Blob]] força novos [[Sha-1]] em toda a cadeia acima dele até o commit.
