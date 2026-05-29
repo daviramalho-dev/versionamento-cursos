@@ -1,77 +1,53 @@
-### Hierarquia de Configuração: Os Três Níveis
+### Definição: git config
+
+O `git config` gerencia as configurações do Git em três níveis hierárquicos. Cada nível tem escopo e arquivo próprios — e o mais específico sempre vence.
 
 |Nível|Flag|Escopo|Arquivo|
 |---|---|---|---|
-|**Sistema**|`--system`|Toda máquina, todos os usuários|`/etc/gitconfig` (Linux/Mac) ou `%ProgramFiles%\Git\etc\gitconfig` (Windows)|
-|**Usuário**|`--global`|Seu usuário do SO, qualquer repo|`~/.gitconfig` (Linux/Mac) ou `%APPDATA%\.gitconfig` (Windows)|
-|**Local**|`--local`|Um repositório específico|`.git/config` dentro do repo|
+|Sistema|`--system`|Toda a máquina, todos os usuários|`/etc/gitconfig`|
+|Usuário|`--global`|Seu usuário do SO, qualquer repo|`~/.gitconfig`|
+|Local|`--local`|Um repositório específico|`.git/config`|
 
-**Ordem de precedência** (última vence):
-
-```
-sistema → usuário → local
-```
-
-Se você define `user.name` em `--global` e depois em `--local`, Git usa o valor local naquele repositório.
+Ordem de precedência: `sistema → usuário → local`. Se `user.name` está definido em `--global` e também em `--local`, o Git usa o valor local naquele repositório.
 
 ---
 
-### Por Quê e Quando Usar Cada Nível
+### Quando usar cada nível
 
-**Use `--system`** quando trabalha em máquina compartilhada e quer padrões para todos os usuários (raro). Requer permissões administrativas.
+`--global` é o mais usado no dia a dia — identidade, editor padrão, aliases, tudo que se aplica a todos os seus projetos.
 
-**Use `--global`** para sua identidade pessoal (`user.name`, `user.email`), editor padrão, aliases — tudo que se aplica a todos seus projetos em uma máquina.
+`--local` quando um projeto precisa de configuração diferente: email corporativo num repo de trabalho, ou identidade específica num repo de demonstração.
 
-**Use `--local`** quando um projeto específico precisa de configurações diferentes: email corporativo em repo de trabalho, identidade falsa em repo de demonstração, ou branches padrão customizados.
+`--system` é raro. Requer permissão administrativa e afeta todos os usuários da máquina.
 
 ---
 
-### Para Editar Diretamente
+### Como fazer
 
 ```bash
-# Abrir em editor
+# Configurações essenciais (--global)
+git config --global user.name "Seu Nome"
+git config --global user.email "seu@email.com"
+git config --global core.editor "code --wait"   # VS Code
+
+# Inspecionar
+git config --list                   # todas as configs ativas
+git config --list --show-origin     # mostra de qual arquivo cada valor vem
+git config user.email               # ver valor específico
+
+# Editar arquivo diretamente
 git config --global --edit
 git config --local --edit
-
-# Ver caminho sem abrir
-git config --list --show-origin
 ```
-
-**Localizações exatas:**
-
-- **Linux/Mac**: `~/.gitconfig` (global) e `.git/config` (local no repo)
-- **Windows**: `C:\Users\SeuUsuário\.gitconfig` (global) e `.git\config` (local)
-- **Sistema**: `/etc/gitconfig` (não disponível em Windows)
 
 ---
 
-### Cascata e Efeitos Colaterais
+### Cascata/Efeitos
 
-Quando você altera uma configuração, ela afeta:
+|Ação|Impacto|
+|---|---|
+|Alterar `--global`|Todos os repos da máquina, presentes e futuros|
+|Alterar `--local`|Apenas o repo atual (`.git/config`)|
+|Alterar `--system`|Todos os usuários e repos — requer `sudo`|
 
-- **`--global`**: Todos os repositórios existentes e novos naquela máquina
-- **`--local`**: Apenas esse repositório (arquivo `.git/config`)
-- **`--system`**: Todos os usuários e repositórios (requere `sudo`)
-
-⚠️ **Armadilha comum:** Você define email global incorreto, faz 50 commits, depois descobre. A solução é:
-
-```bash
-# Corrigir futuro
-git config --global user.email "correto@email.com"
-
-# Passado: necessário reescrever histórico (git filter-branch, etc.)
-```
-
-A cascata de leitura funciona assim:
-
-```
-Início do comando git
-        ↓
-Verifica .git/config (local)
-        ↓
-Verifica ~/.gitconfig (global)
-        ↓
-Verifica /etc/gitconfig (sistema)
-        ↓
-Usa primeiro valor encontrado
-```
+> ⚠️ Email global errado + 50 commits = problema. Corrigir o futuro é simples (`git config --global user.email "certo@email.com"`), mas corrigir o histórico já commitado exige reescrita com `git filter-branch` ou ferramentas similares. Verifique antes de começar a trabalhar num repositório novo.
